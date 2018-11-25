@@ -1,0 +1,29 @@
+{
+  "name": "my_vue_components",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "storybook": "start-storybook -p 9001 -c .storybook"
+  },
+  "keywords": [
+    "vue",
+    "component"
+  ],
+  "author": "fanxq",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.1.6",
+    "@storybook/vue": "^4.0.8",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.4",
+    "babel-preset-vue": "^2.0.2",
+    "vue-loader": "^15.4.2",
+    "vue-template-compiler": "^2.5.17"
+  },
+  "dependencies": {
+    "bootstrap": "^4.1.3",
+    "vue": "^2.5.17"
+  }
+}

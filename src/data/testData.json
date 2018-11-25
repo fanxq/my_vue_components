@@ -1,0 +1,11 @@
+{
+    "autoCompleteComponentTestData":[
+        {"name":"tom","age":21},
+        {"name":"tim","age":20},
+        {"name":"tony","age":23},
+        {"name":"mary","age":20},
+        {"name":"jim","age":22},
+        {"name":"jenny","age":25},
+        {"name":"bob","age":21}
+    ]
+}
