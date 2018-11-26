@@ -1,6 +1,6 @@
 <template>
     <div class="pagination-container">
-            <div class="pull-left float-left pagination-detail">
+            <div class="pagination-detail">
                 <span>{{paginationInfo}}</span>
                 <span>每页显示 
                     <span>
@@ -8,7 +8,7 @@
                     </span> 条记录
                 </span>
             </div>
-            <div class="pull-right float-right pagination">
+            <div class="pagination-bar">
                 <ul class="pagination" v-on:click="onPageNumSelected">
                     <li class="page-pre"><a href="#">‹</a></li>
                     <li v-for="(item,index) in pageNumList" v-bind:key="index" v-bind:class="{active: item.isActive,disabled:item.isDisabled}">
@@ -20,13 +20,18 @@
         </div>
 </template>
 <style scoped>
-    .pagination-container div.pagination,
+    .pagination-container .pagination-bar,
     .pagination-container .pagination-detail {
         margin-top: 10px;
         margin-bottom: 10px;
     }
-
-    .pagination-container div.pagination .pagination {
+    .pagination-container .pagination-detail{
+        float: left !important;
+    }
+    .pagination-container .pagination-bar{
+        float: right !important;
+    }
+    .pagination-container .pagination-bar .pagination {
         margin: 0;
     }
 
@@ -34,29 +39,28 @@
         padding: 6px 12px;
         line-height: 1.428571429;
     }
-
-    .pagination-container .pagination-info {
-        line-height: 34px;
-        margin-right: 5px;
+    
+    .pagination-container .pagination a{
+        background-color: #eff0f4;
+        border: 1px solid #ffffff;
+        color: black;
+        cursor: default;
+    }
+    .pagination-container .pagination a:hover{
+        background-color: #65cea7;
+        color: white;
     }
 
-    .pagination-container .btn-group {
-        position: relative;
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    .pagination-container .dropup .dropdown-menu {
-        margin-bottom: 0;
-    }
-
-    .pagination-container .page-list {
-        display: inline-block;
+    .pagination-container li.active a{
+        background-color: #34a57a;
+        color: white;
     }
     .pagination-container li.disabled a {
         pointer-events: none;
         cursor: default;
+        background-color: #e8e9f0;
     }
+
     .pagination-container:after {
         content: "";
         display: block;
