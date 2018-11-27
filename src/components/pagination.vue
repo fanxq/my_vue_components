@@ -45,6 +45,7 @@
         border: 1px solid #ffffff;
         color: black;
         cursor: default;
+        text-decoration: none;
     }
     .pagination-container .pagination a:hover{
         background-color: #65cea7;
