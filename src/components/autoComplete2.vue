@@ -1,8 +1,9 @@
 <template>
     <div style="position:relative;">
         <input type="text" v-bind:id="inputId" class="form-control input-sm" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" v-bind:disabled="disable">
-        <ul class="my-select" v-show="show" v-bind:id="selectId">
-            <li v-for="(item, index) in items" v-bind:key="index" v-bind:class="[liStyle,{'item-selected':index === selectedIndex}]">{{item.name}}</li>
+        <ul class="my-select" v-show="show">
+            <!-- <li v-for="(item, index) in options" v-bind:key="index" v-bind:class="[liStyle,{'item-selected':index === selectedIndex}]">{{item.name}}</li> -->
+
         </ul>
         <div class="warning" v-show="showWarning">
             <slot name="warning">提示信息</slot>
@@ -51,23 +52,32 @@
 export default {
     data: function () {
         return {
-            items: [],
-            selectId: new Date().getTime(),
             show: false,
             select: false,
-            liStyle: 'item',
             selectedIndex: 0,
-            wait: false,
             showWarning: false,
             inputId: 'input-' + new Date().getTime(),
             init:false
         }
     },
-    props: ['disable','value', 'searchFunction'],
+    props:{
+        disable:{
+            type:Boolean,
+            default:false
+        },
+        options:{
+            type:Array,
+            required:true
+        },
+        value:{
+            type:String,
+            required:true
+        }
+    },
     watch: {
         select: function (val) {
-            if (val && this.items.length > 0 && this.selectedIndex < this.items.length) {
-                this.$emit('selected', this.items[this.selectedIndex]);
+            if (val && this.options.length > 0 && this.selectedIndex < this.options.length) {
+                this.$emit('selected', this.options[this.selectedIndex]);
             }
         },
         value:{
@@ -110,11 +120,11 @@ export default {
                 }
                 this.show = true;
                 this.selectedIndex = findIndex === -1 ? 0 : findIndex;
-                this.items.splice(0, this.items.length, ...findResult);
+                this.options.splice(0, this.options.length, ...findResult);
             } else {
                 this.show = false;
                 this.selectedIndex = 0;
-                this.items.splice(0, this.items.length);
+                this.options.splice(0, this.options.length);
                 this.showWarning = true;
                 this.$emit('selected', null);
             }
@@ -135,7 +145,7 @@ export default {
             if (self.show) {
                 if (target.tagName === 'LI' && target.classList.contains('item')) {
                     var index = -1;
-                    self.items.forEach(function (x, idx) {
+                    self.options.forEach(function (x, idx) {
                         if (x.name === target.textContent) {
                             index = idx;
                             return;
@@ -149,8 +159,8 @@ export default {
                 }
                 else {
                     self.selectedIndex = 0;
-                    self.setSelected(self.items[0].name);
-                    self.$emit('input', self.items[0].name);
+                    self.setSelected(self.options[0].name);
+                    self.$emit('input', self.options[0].name);
                 }
                 self.show = false;
             }
@@ -168,11 +178,11 @@ export default {
                     case 40:
                         inputCtr.blur();
                         self.selectedIndex = self.selectedIndex + 1;
-                        self.selectedIndex = (self.selectedIndex >= self.items.length ? self.items.length - 1 : self.selectedIndex);
+                        self.selectedIndex = (self.selectedIndex >= self.options.length ? self.options.length - 1 : self.selectedIndex);
                         break;
                     case 13:
-                        self.setSelected(self.items[self.selectedIndex].name);
-                        self.$emit('input', self.items[self.selectedIndex].name);
+                        self.setSelected(self.options[self.selectedIndex].name);
+                        self.$emit('input', self.options[self.selectedIndex].name);
                         self.show = false;
                         inputCtr.focus();
                         break;

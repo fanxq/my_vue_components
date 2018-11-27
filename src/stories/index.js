@@ -3,8 +3,10 @@ import Vue from 'vue';
 import { storiesOf } from '@storybook/vue';
 
 import autoComplete from '../components/autoComplete.vue';
-import testData from '../data/testData.json';
+import testData from '../assets/testData.json';
 import pagination from '../components/pagination.vue';
+import testImg from '../assets/Penguins.jpg';
+import imageCropper from '../components/imageCropper.vue';
 storiesOf('AutoComplete', module)
   .add('test autoComplete component', () => ({
     data(){
@@ -28,7 +30,9 @@ storiesOf('AutoComplete', module)
     components: { 'auto-complete':autoComplete },
     template: `
     <div style='margin:20px auto;width:200px;'>
-        <auto-complete v-on:selected="onSelect" v-model="value" v-bind:search-function="search" v-bind:warning="warning"></auto-complete>
+        <auto-complete v-on:selected="onSelect" v-model="value" v-bind:search-function="search">
+            <span slot="warning">{{warning}}</span>
+        </auto-complete>
         <div><span>选中：</span><span>{{selectItem}}</span></div>
     </div>`
   }));
@@ -45,4 +49,16 @@ storiesOf('Pagination', module).add('test pagination component',()=>({
     },
     template:`<div><pagination v-bind:page-size-set="pageSizeSet" v-bind:total="total"></pagination></div>`
 
+}));
+
+storiesOf('ImageCropper',module).add('test imageCropper component',()=>({
+    data(){
+        return{
+            img:testImg
+        }
+    },
+    components: {
+        'image-cropper':imageCropper
+    },
+    template:`<div style="width:500px;height:500px;"><image-cropper v-bind:img-src="img"></image-cropper></div>`
 }));
