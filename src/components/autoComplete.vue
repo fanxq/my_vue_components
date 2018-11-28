@@ -1,8 +1,8 @@
 <template>
     <div style="position:relative;">
-        <input type="text" v-bind:id="inputId" class="form-control input-sm" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" v-bind:disabled="disable">
-        <ul class="my-select" v-show="show" v-bind:id="selectId">
-            <li v-for="(item, index) in items" v-bind:key="index" v-bind:class="[liStyle,{'item-selected':index === selectedIndex}]">{{item.name}}</li>
+        <input type="text" v-bind:id="inputId" class="form-control form-control-sm" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" v-bind:disabled="disable">
+        <ul class="my-select" v-show="show">
+            <li v-for="(option, index) in options" v-bind:key="index" v-bind:class="{'active':index === activeIndex}">{{option}}</li>
         </ul>
         <div class="warning" v-show="showWarning">
             <slot name="warning">提示信息</slot>
@@ -23,7 +23,7 @@
         width:100%;
     }
 
-    .my-select .item {
+    .my-select li {
         height: 30px;
         line-height: 30px;
         padding-left: 10px;
@@ -33,12 +33,12 @@
         text-overflow: ellipsis;  
     }
 
-    .my-select .item:hover {
+    .my-select li:hover {
         background-color: rgba(50, 50, 250, 0.45);
         color: white;
     }
 
-    .my-select .item-selected {
+    .my-select li.active {
         background-color: rgba(50, 50, 250, 0.705);
         color: white;
     }
@@ -51,25 +51,18 @@
 export default {
     data: function () {
         return {
-            items: [],
-            selectId: new Date().getTime(),
             show: false,
             select: false,
-            liStyle: 'item',
-            selectedIndex: 0,
+            activeIndex: 0,
             wait: false,
             showWarning: false,
             inputId: 'input-' + new Date().getTime(),
-            init:false
+            init:false,
+            items:JSON.parse(JSON.stringify(this.options))
         }
     },
-    props: ['disable','value', 'searchFunction'],
+    props: ['disable','value', 'options'],
     watch: {
-        select: function (val) {
-            if (val && this.items.length > 0 && this.selectedIndex < this.items.length) {
-                this.$emit('selected', this.items[this.selectedIndex]);
-            }
-        },
         value:{
             handler:function(val){
                 this.showWarning = false;
@@ -83,18 +76,10 @@ export default {
                         return;
                     }
                     var self = this;
-                    if (!this.wait) {
-                        this.searchFunction(val, this.onSearch);
-                        this.wait = true;
-                        setTimeout(function () {
-                            self.wait = false;
-                        }, 300);
-                    }
+                    this.onSearch(val);
 
                 } else {
-                    console.log("not selected!");
                     this.select = false;
-                    this.$emit('selected', null);
                     this.show = false;
                 }
             },
@@ -102,21 +87,18 @@ export default {
         }
     },
     methods: {
-        onSearch: function (findResult) {
-            if (findResult && findResult.length > 0 && this.value) {
-                var findIndex = 0;
-                if (Array.prototype.findIndex) {
-                    findIndex = findResult.findIndex(x=>x.name === this.value);
-                }
+        onSearch: function (val) {
+            var findResult = this.items.filter(x=>x.includes(val));
+            if (findResult && findResult.length > 0) {
+                var findIndex = findResult.findIndex(x=>x.name === val);
                 this.show = true;
-                this.selectedIndex = findIndex === -1 ? 0 : findIndex;
-                this.items.splice(0, this.items.length, ...findResult);
+                this.activeIndex = findIndex === -1 ? 0 : findIndex;
+                this.options.splice(0, this.options.length, ...findResult);
             } else {
                 this.show = false;
-                this.selectedIndex = 0;
-                this.items.splice(0, this.items.length);
+                this.activeIndex = 0;
+                this.options.splice(0, this.options.length);
                 this.showWarning = true;
-                this.$emit('selected', null);
             }
         },
         setSelected: function (val) {
@@ -133,24 +115,18 @@ export default {
         document.addEventListener('click', function (e) {
             var target = e.target;
             if (self.show) {
-                if (target.tagName === 'LI' && target.classList.contains('item')) {
-                    var index = -1;
-                    self.items.forEach(function (x, idx) {
-                        if (x.name === target.textContent) {
-                            index = idx;
-                            return;
-                        }
-                    });
+                if (target.tagName === 'LI' && target.parentNode && target.parentNode.classList.contains('my-select')) {
+                    var index = self.options.indexOf(target.textContent);
                     if (index !== -1) {
-                        self.selectedIndex = index;
+                        self.activeIndex = index;
                         self.setSelected(target.textContent);
                         self.$emit('input', target.textContent);
                     }
                 }
                 else {
-                    self.selectedIndex = 0;
-                    self.setSelected(self.items[0].name);
-                    self.$emit('input', self.items[0].name);
+                    self.activeIndex = 0;
+                    self.setSelected(self.options[0]);
+                    self.$emit('input', self.options[0]);
                 }
                 self.show = false;
             }
@@ -160,19 +136,18 @@ export default {
             if (e && self.show) {
                 switch (e.keyCode) {
                     case 38:
-                        //$("#" + self.inputId).blur();
                         inputCtr.blur();
-                        self.selectedIndex = self.selectedIndex - 1;
-                        self.selectedIndex = (self.selectedIndex >= 0 ? self.selectedIndex : 0);
+                        self.activeIndex = self.activeIndex - 1;
+                        self.activeIndex = (self.activeIndex >= 0 ? self.activeIndex : 0);
                         break;
                     case 40:
                         inputCtr.blur();
-                        self.selectedIndex = self.selectedIndex + 1;
-                        self.selectedIndex = (self.selectedIndex >= self.items.length ? self.items.length - 1 : self.selectedIndex);
+                        self.activeIndex = self.activeIndex + 1;
+                        self.activeIndex = (self.activeIndex >= self.options.length ? self.options.length - 1 : self.activeIndex);
                         break;
                     case 13:
-                        self.setSelected(self.items[self.selectedIndex].name);
-                        self.$emit('input', self.items[self.selectedIndex].name);
+                        self.setSelected(self.options[self.activeIndex]);
+                        self.$emit('input', self.options[self.activeIndex]);
                         self.show = false;
                         inputCtr.focus();
                         break;

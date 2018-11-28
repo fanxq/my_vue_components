@@ -3,39 +3,26 @@ import Vue from 'vue';
 import { storiesOf } from '@storybook/vue';
 
 import autoComplete from '../components/autoComplete.vue';
-import testData from '../assets/testData.json';
-import {records} from '../assets/testData.js';
+import {records, randomTexts} from '../assets/testData.js';
 import pagination from '../components/pagination.vue';
 import testImg from '../assets/Penguins.jpg';
 import imageCropper from '../components/imageCropper.vue';
-console.log(records);
+
 storiesOf('AutoComplete', module)
   .add('test autoComplete component', () => ({
     data(){
         return{
             value:'',
-            search:function(val,cb){
-                if(val){
-                    var rs = testData.autoCompleteComponentTestData.filter(x=>x.name.includes(val));
-                    cb(rs);
-                }
-            },
-            selectItem:'',
+            options:randomTexts,
             warning:'not find!'
-        }
-    },
-    methods: {
-        onSelect:function(item){
-            this.selectItem = JSON.stringify(item);
         }
     },
     components: { 'auto-complete':autoComplete },
     template: `
     <div style='margin:20px auto;width:200px;'>
-        <auto-complete v-on:selected="onSelect" v-model="value" v-bind:search-function="search">
+        <auto-complete v-model="value" v-bind:options="options">
             <span slot="warning">{{warning}}</span>
         </auto-complete>
-        <div><span>选中：</span><span>{{selectItem}}</span></div>
     </div>`
   }));
 
