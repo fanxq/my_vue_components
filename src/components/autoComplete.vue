@@ -54,7 +54,6 @@ export default {
             show: false,
             select: false,
             activeIndex: 0,
-            wait: false,
             showWarning: false,
             inputId: 'input-' + new Date().getTime(),
             init:false,

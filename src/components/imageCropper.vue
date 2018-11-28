@@ -9,7 +9,7 @@
             v-on:mouseout="onCanvasMouseOut"
             ></canvas>
         <div v-show="showBtns" style="position:absolute;" v-bind:style="{left:btnsLeft,top:btnsTop}">
-            <button type="button" class="btn btn-sm btn-ok" title="确定" v-on:click="save">&#x2714;</button>
+            <button type="button" class="btn btn-sm btn-ok" title="确定" v-on:click="save">&#x2713;</button>
             <button type="button" class="btn btn-sm btn-cancel" title="取消" v-on:click="cancel">&#x2718;</button>
         </div>
     </div>
