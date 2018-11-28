@@ -3,8 +3,8 @@
             <div class="pagination-detail">
                 <span>{{paginationInfo}}</span>
                 <span>每页显示 
-                    <span>
-                        <select v-model="pageSize"><option v-for="item in pageSizeSet" v-bind:key="item" v-bind:value="item">{{item}}</option></select>
+                    <span style="display:inline-block;">
+                        <select v-model="pageSize" class="form-control-sm"><option v-for="item in pageSizeSet" v-bind:key="item" v-bind:value="item">{{item}}</option></select>
                     </span> 条记录
                 </span>
             </div>

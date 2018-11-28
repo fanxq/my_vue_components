@@ -1,6 +1,6 @@
 <template>
      <div v-bind:id="containerId" class="container">
-        <img id="source" v-bind:src="imgSrc" draggable="false" style="object-fit:contain;">
+        <img id="source" v-bind:src="imgSrc" draggable="false">
         <canvas v-bind:id="canvasId" v-bind:width="canvasWidth" 
             v-bind:height="canvasHeight"
             v-on:mousedown="onCanvasMouseDown" 
@@ -9,8 +9,8 @@
             v-on:mouseout="onCanvasMouseOut"
             ></canvas>
         <div v-show="showBtns" style="position:absolute;" v-bind:style="{left:btnsLeft,top:btnsTop}">
-            <button type="button" class="btn btn-ok" v-on:click="save">确定</button>
-            <button type="button" class="btn btn-cancel" v-on:click="cancel">取消</button>
+            <button type="button" class="btn btn-sm btn-ok" v-on:click="save">&#x2714;</button>
+            <button type="button" class="btn btn-sm btn-cancel" v-on:click="cancel">&#x2718;</button>
         </div>
     </div>
 </template>
@@ -33,19 +33,20 @@
         margin: 0;       
     }
     .container .btn{
-        display: inline-block;
-        padding: 5px 5px;
-        margin: 0;
         color: white;
     }
     .btn-ok{
         background-color: #23dc80;
+        border-radius: 100%;
+        opacity: 0.5;
     }
     .btn-ok:hover{
         background-color: #1ba560;
     }
     .btn-cancel{
         background-color: #de584e;
+        border-radius: 100%;
+        opacity: 0.5;
     }
     .btn-cancel:hover{
         background-color: #d33427;
