@@ -171,6 +171,8 @@ export default {
         save:function() {
             var output = document.createElement('canvas');
             output.style.display = 'none';
+            output.width = this.clipWidth * this.scaleWidth;
+            output.height = this.clipHeight * this.scaleHeight;
             document.body.appendChild(output);
             var ctx = output.getContext('2d');
             if(this.clipWidth < 0){
