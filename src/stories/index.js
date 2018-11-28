@@ -99,5 +99,19 @@ storiesOf('ImageCropper',module).add('test imageCropper component',()=>({
     components: {
         'image-cropper':imageCropper
     },
-    template:`<div style="width:900px;height:650px;"><image-cropper v-bind:img-src="img"></image-cropper></div>`
+    methods: {
+        showOutPut:function(src) {
+            if(src){
+                document.getElementById('output').innerHTML = `<img src="${src}">`;
+            }
+        }  
+    },
+    template:`
+    <div>
+        <div style="width:900px;height:650px;">
+            <image-cropper v-bind:img-src="img" v-on:output="showOutPut"></image-cropper>
+        </div>
+        <div id="output">
+        </div>
+    </div>`
 }));

@@ -1,6 +1,6 @@
 <template>
      <div v-bind:id="containerId" class="container">
-        <img id="source" v-bind:src="imgSrc" draggable="false">
+        <img id="source" v-bind:src="imgSrc" v-on:load="onLoadImage" draggable="false">
         <canvas v-bind:id="canvasId" v-bind:width="canvasWidth" 
             v-bind:height="canvasHeight"
             v-on:mousedown="onCanvasMouseDown" 
@@ -9,8 +9,8 @@
             v-on:mouseout="onCanvasMouseOut"
             ></canvas>
         <div v-show="showBtns" style="position:absolute;" v-bind:style="{left:btnsLeft,top:btnsTop}">
-            <button type="button" class="btn btn-sm btn-ok" v-on:click="save">&#x2714;</button>
-            <button type="button" class="btn btn-sm btn-cancel" v-on:click="cancel">&#x2718;</button>
+            <button type="button" class="btn btn-sm btn-ok" title="确定" v-on:click="save">&#x2714;</button>
+            <button type="button" class="btn btn-sm btn-cancel" title="取消" v-on:click="cancel">&#x2718;</button>
         </div>
     </div>
 </template>
@@ -38,7 +38,6 @@
     .btn-ok{
         background-color: #23dc80;
         border-radius: 100%;
-        opacity: 0.5;
     }
     .btn-ok:hover{
         background-color: #1ba560;
@@ -46,7 +45,6 @@
     .btn-cancel{
         background-color: #de584e;
         border-radius: 100%;
-        opacity: 0.5;
     }
     .btn-cancel:hover{
         background-color: #d33427;
@@ -61,7 +59,8 @@ export default {
             startX: 0,
             startY: 0,
             isMousePressed: false,
-            scale: 1,//缩放比例
+            scaleWidth: 1,//缩放比例
+            scaleHeight:1,
             imgLeft: 0,
             imgTop: 0,
             canvasId:`canvas-${new Date().getTime()}`,
@@ -82,7 +81,17 @@ export default {
         this.ctx = canvas.getContext('2d');
     },
     methods:{
+        onLoadImage:function(ev) {
+            if(ev && ev.target){
+                var imageNaturalHeight = ev.target.naturalHeight;
+                var imageNaturalWidth = ev.target.naturalWidth;
+                this.scaleWidth = imageNaturalWidth/ev.target.clientWidth;
+                this.scaleHeight = imageNaturalHeight/ev.target.clientHeight;
+                console.log(this.scaleWidth, this.scaleHeight);
+            }  
+        },
         onCanvasMouseDown: function (ev) {
+            this.showBtns = false;
             if (ev) {
                 this.isMousePressed = true;
                 this.startX = ev.offsetX;
@@ -102,7 +111,6 @@ export default {
                 var deltaX = ev.offsetX - this.startX;
                 var deltaY = ev.offsetY - this.startY;
                 if (Math.abs(deltaX) > 0 && Math.abs(deltaY) > 0) {
-                    //this.showOutput();
                     this.btnsLeft = `${Math.min(ev.offsetX, this.startX)}px`;
                     this.btnsTop = `${Math.max(ev.offsetY, this.startY) + 2}px`;
                     this.showBtns = true;
@@ -110,18 +118,19 @@ export default {
                 }else{
                     this.clear();
                 }
-                // this.startX = this.startY = 0;
-                // this.clear();
             }
         },
         onCanvasMouseOut:function(ev){
             if (ev) {
                 if (this.isMousePressed) {
                     this.isMousePressed = false;
-                    this.showBtns = true;
-                    //this.showOutput();
-                    // this.startX = this.startY = 0;
-                    // this.clear();
+                    if(this.clipWidth && this.clipHeight){
+                        this.btnsLeft = Math.min(this.startX, this.startX + this.clipWidth) + 'px';
+                        this.btnsTop =  Math.max(this.startY, this.startY + this.clipHeight + 2) + 'px';
+                        this.showBtns = true;
+                    }else{
+                        this.clear();
+                    }
                 }
             }
         },
@@ -160,7 +169,24 @@ export default {
             this.showBtns = false;
         },
         save:function() {
-            
+            var output = document.createElement('canvas');
+            output.style.display = 'none';
+            document.body.appendChild(output);
+            var ctx = output.getContext('2d');
+            if(this.clipWidth < 0){
+                this.startX = this.startX + this.clipWidth;
+                this.clipWidth = Math.abs(this.clipWidth);
+            }
+            if(this.clipHeight < 0){
+                this.startY = this.startY + this.clipHeight;
+                this.clipHeight = Math.abs(this.clipHeight);
+            }
+            ctx.drawImage(document.getElementById('source'),
+                this.startX*this.scaleWidth,this.startY*this.scaleHeight,this.clipWidth*this.scaleWidth,this.clipHeight*this.scaleHeight,
+                0,0,this.clipWidth*this.scaleWidth,this.clipHeight*this.scaleHeight);
+            this.$emit('output',output.toDataURL("image/png", 1));
+            document.body.removeChild(output);
+            this.clear();
         },
         cancel:function(){
             this.clear();
