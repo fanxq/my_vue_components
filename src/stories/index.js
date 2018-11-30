@@ -98,7 +98,11 @@ storiesOf('ImageCropper',module).add('test imageCropper component',()=>({
         <div style="width:900px;height:650px;">
             <image-cropper v-bind:img-src="img" v-on:output="showOutPut"></image-cropper>
         </div>
-        <div id="output">
+        <div style="margin-top:10px;">
+            <h4>Output</h4>
+            <div id="output">
+            </div>
         </div>
+        
     </div>`
 }));
