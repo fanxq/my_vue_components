@@ -2,7 +2,7 @@
     <div style="position:relative;">
         <input type="text" v-bind:id="inputId" class="form-control form-control-sm" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" v-bind:disabled="disable">
         <ul class="my-select" v-show="show">
-            <li v-for="(option, index) in options" v-bind:key="index" v-bind:class="{'active':index === activeIndex}">{{option}}</li>
+            <li v-for="(option, index) in filteredOptions" v-bind:key="index" v-bind:class="{'active':index === activeIndex}" v-html="option.display" v-bind:data="option.data"></li>
         </ul>
         <div class="warning" v-show="showWarning">
             <slot name="warning">提示信息</slot>
@@ -57,7 +57,7 @@ export default {
             showWarning: false,
             inputId: 'input-' + new Date().getTime(),
             init:false,
-            items:JSON.parse(JSON.stringify(this.options))
+            filteredOptions:[]
         }
     },
     props: ['disable','value', 'options'],
@@ -87,16 +87,21 @@ export default {
     },
     methods: {
         onSearch: function (val) {
-            var findResult = this.items.filter(x=>x.includes(val));
+            var findResult = this.options.filter(x=>x.includes(val));
             if (findResult && findResult.length > 0) {
-                var findIndex = findResult.findIndex(x=>x.name === val);
+                findResult = findResult.map(x=>{
+                    return {
+                        display:`${x.replace(new RegExp('('+val+')','g'),'<span style="color:red;">$1</span>')}`,
+                        data:x
+                    };
+                })
                 this.show = true;
-                this.activeIndex = findIndex === -1 ? 0 : findIndex;
-                this.options.splice(0, this.options.length, ...findResult);
+                this.activeIndex = 0; //findIndex === -1 ? 0 : findIndex;
+                this.filteredOptions.splice(0, this.filteredOptions.length, ...findResult);
             } else {
                 this.show = false;
                 this.activeIndex = 0;
-                this.options.splice(0, this.options.length);
+                this.filteredOptions.splice(0, this.filteredOptions.length);
                 this.showWarning = true;
             }
         },
@@ -115,18 +120,15 @@ export default {
             var target = e.target;
             if (self.show) {
                 if (target.tagName === 'LI' && target.parentNode && target.parentNode.classList.contains('my-select')) {
-                    var index = self.options.indexOf(target.textContent);
-                    if (index !== -1) {
-                        self.activeIndex = index;
-                        self.setSelected(target.textContent);
-                        self.$emit('input', target.textContent);
-                    }
+                    var selectedOption = target.getAttribute('data');
+                    self.setSelected(selectedOption);
+                    self.$emit('input', selectedOption);
                 }
                 else {
-                    self.activeIndex = 0;
-                    self.setSelected(self.options[0]);
-                    self.$emit('input', self.options[0]);
+                    self.setSelected(self.filteredOptions[self.activeIndex||0].data);
+                    self.$emit('input', self.filteredOptions[self.activeIndex||0].data);
                 }
+               
                 self.show = false;
             }
         }, false);
@@ -142,11 +144,11 @@ export default {
                     case 40:
                         inputCtr.blur();
                         self.activeIndex = self.activeIndex + 1;
-                        self.activeIndex = (self.activeIndex >= self.options.length ? self.options.length - 1 : self.activeIndex);
+                        self.activeIndex = (self.activeIndex >= self.filteredOptions.length ? self.filteredOptions.length - 1 : self.activeIndex);
                         break;
                     case 13:
-                        self.setSelected(self.options[self.activeIndex]);
-                        self.$emit('input', self.options[self.activeIndex]);
+                        self.setSelected(self.filteredOptions[self.activeIndex].data);
+                        self.$emit('input', self.filteredOptions[self.activeIndex].data);
                         self.show = false;
                         inputCtr.focus();
                         break;
