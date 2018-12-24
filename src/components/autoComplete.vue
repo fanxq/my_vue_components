@@ -14,7 +14,7 @@
         list-style: none;
         padding: 0px;
         margin: 0px;
-        border: 1px solid rgba(50, 50, 250, 0.45);
+        border: 1px solid #96c2efee;
         position:absolute;
         left:0;
         top:34px;
@@ -30,17 +30,17 @@
         padding-right:10px;
         white-space:nowrap;   
         overflow:hidden;         
-        text-overflow: ellipsis;  
+        text-overflow: ellipsis;
+        font-weight: bold;
+        color: #7d7d7d;  
     }
 
     .my-select li:hover {
-        background-color: rgba(50, 50, 250, 0.45);
-        color: white;
+        background-color:#cccccc8a;
     }
 
     .my-select li.active {
-        background-color: rgba(50, 50, 250, 0.705);
-        color: white;
+        background-color:#96c2ef8a;
     }
     .warning{
         background-color:#f2dede;color:red;
