@@ -1,7 +1,7 @@
 <template>
     <div style="position:relative;">
-        <input type="text" v-bind:id="inputId" class="form-control form-control-sm" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" v-bind:disabled="disable">
-        <ul class="my-select" v-show="show">
+        <input type="text" v-bind:id="inputId" class="form-control form-control-sm" v-bind:value="value" v-on:input="$emit('input', $event.target.value)" v-bind="$attrs">
+        <ul class="my-select" v-show="show" @click="onOptionListClick">
             <li v-for="(option, index) in filteredOptions" v-bind:key="index" v-bind:class="{'active':index === activeIndex}" v-html="option.display" v-bind:data="option.data"></li>
         </ul>
         <div class="warning" v-show="showWarning">
@@ -49,6 +49,7 @@
 </style>
 <script>
 export default {
+    inheritAttrs:false,
     data: function () {
         return {
             show: false,
@@ -60,7 +61,7 @@ export default {
             filteredOptions:[]
         }
     },
-    props: ['disable','value', 'options'],
+    props: ['value', 'options'],
     watch: {
         value:{
             handler:function(val){
@@ -96,7 +97,7 @@ export default {
                     };
                 })
                 this.show = true;
-                this.activeIndex = 0; //findIndex === -1 ? 0 : findIndex;
+                this.activeIndex = 0;
                 this.filteredOptions.splice(0, this.filteredOptions.length, ...findResult);
             } else {
                 this.show = false;
@@ -111,50 +112,48 @@ export default {
             } else {
                 this.select = true;
             }
+        },
+        onOptionListClick:function(e) {
+            var target = e.target;
+            if (this.show) {
+                if (target.tagName === 'LI' || target.tagName === 'SPAN') {
+                    var selectedOption = target.getAttribute('data');
+                    this.setSelected(selectedOption);
+                    this.$emit('input', selectedOption);
+                }
+                else {
+                    this.setSelected(this.filteredOptions[this.activeIndex||0].data);
+                    this.$emit('input', this.filteredOptions[this.activeIndex||0].data);
+                }
+                this.show = false;
+            }
+        },
+        onKeyDown:function(e) {
+            if (e && this.show) {
+                switch (e.keyCode) {
+                    case 38:
+                        this.activeIndex = this.activeIndex - 1;
+                        this.activeIndex = (this.activeIndex >= 0 ? this.activeIndex : 0);
+                        break;
+                    case 40:
+                        this.activeIndex = this.activeIndex + 1;
+                        this.activeIndex = (this.activeIndex >= this.filteredOptions.length ? this.filteredOptions.length - 1 : this.activeIndex);
+                        break;
+                    case 13:
+                        this.setSelected(this.filteredOptions[this.activeIndex].data);
+                        this.$emit('input', this.filteredOptions[this.activeIndex].data);
+                        this.show = false;
+                        break;
+                }
+            }
         }
     },
     mounted () {
-        var self = this;
-        var inputCtr = document.getElementById(self.inputId);
-        document.addEventListener('click', function (e) {
-            var target = e.target;
-            if (self.show) {
-                if (target.tagName === 'LI' && target.parentNode && target.parentNode.classList.contains('my-select')) {
-                    var selectedOption = target.getAttribute('data');
-                    self.setSelected(selectedOption);
-                    self.$emit('input', selectedOption);
-                }
-                else {
-                    self.setSelected(self.filteredOptions[self.activeIndex||0].data);
-                    self.$emit('input', self.filteredOptions[self.activeIndex||0].data);
-                }
-               
-                self.show = false;
-            }
-        }, false);
-
-        document.addEventListener('keydown', function (e) {
-            if (e && self.show) {
-                switch (e.keyCode) {
-                    case 38:
-                        inputCtr.blur();
-                        self.activeIndex = self.activeIndex - 1;
-                        self.activeIndex = (self.activeIndex >= 0 ? self.activeIndex : 0);
-                        break;
-                    case 40:
-                        inputCtr.blur();
-                        self.activeIndex = self.activeIndex + 1;
-                        self.activeIndex = (self.activeIndex >= self.filteredOptions.length ? self.filteredOptions.length - 1 : self.activeIndex);
-                        break;
-                    case 13:
-                        self.setSelected(self.filteredOptions[self.activeIndex].data);
-                        self.$emit('input', self.filteredOptions[self.activeIndex].data);
-                        self.show = false;
-                        inputCtr.focus();
-                        break;
-                }
-            }
-        }, false);
+        document.addEventListener('keydown', this.onKeyDown.bind(this), false);
+    },
+    destroyed(){
+        console.log("onDestory");
+        document.removeEventListener('keydown',this.onKeyDown);
     }
 }
 </script>
