@@ -1,1 +1,1 @@
-该项目记录了本人在学习Vue.js和工作过程中写的几个Vue组件，具体效果请查看[https://fanxq.github.io/my_vue_components](https://fanxq.github.io/my_vue_components)
+该项目记录了本人在学习Vue.js和工作过程中写的几个Vue组件，具体效果请查看[https://fanxq.github.io/my_vue_components](https://fanxq.github.io/my_vue_components/)
